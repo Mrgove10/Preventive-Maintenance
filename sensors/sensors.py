@@ -1,16 +1,20 @@
 import csv
 import json
-from pathlib import Path
+import re
 import time
+from pathlib import Path
+
 import paho.mqtt.client as MQTTLib
 from typer import Typer
 
 cli = Typer()
 
+
 def on_connect(client, userdata, flags, rc):
     print(userdata)
     print(flags)
     print("Connection returned result: " + MQTTLib.connack_string(rc))
+
 
 def etablish_mqtt_connexion():
     client = MQTTLib.Client()
@@ -19,9 +23,11 @@ def etablish_mqtt_connexion():
     print("connection initiated")
     return client
 
+
 def publish(*, topic: str, payload: str):
     client = etablish_mqtt_connexion()
     client.publish(topic, payload)
+
 
 def create_csv_file(header: str, d: list, index: int):
     if not d:
@@ -35,6 +41,7 @@ def create_csv_file(header: str, d: list, index: int):
         f.writelines(",".join(header))
         f.write("\n")
         f.writelines("\n".join(data))
+
 
 @cli.command()
 def split_file():
@@ -59,14 +66,16 @@ def split_file():
 @cli.command()
 def file_to_mqtt():
     path = Path("/data")
+    regex = re.compile(r"[\d+].csv")
 
     for file in path.iterdir():
-        if file.is_file():
-            if file.name != "dataset_MP.csv" and file.name != "requirements.txt" and file.name != "sensors.py":
-                content = file.read_text()
-                print(f"sensor/{file.stem}")
-                publish(topic=f"sensor/{file.stem}", payload=json.dumps(content.split("\n").pop(0)))
-                time.sleep(2.5)
+        if file.is_file() and regex.match(file.name):
+            with open(file) as f:
+                reader = csv.DictReader(f, delimiter=",")
+                for row in reader:
+                    publish(topic=f"sensor/{file.stem}", payload=json.dumps(row))
+                    time.sleep(2.5)
+
 
 if __name__ == "__main__":
     cli()
