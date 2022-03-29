@@ -2,7 +2,7 @@ FROM alpine
 RUN echo 'hello'
 RUN mkdir /data
 COPY dataset/dataset_MP.csv /data/
-RUN ls /data
+COPY sensors/sensors.py /data/
 
 # Install python/pip
 ENV PYTHONUNBUFFERED=1
@@ -11,3 +11,5 @@ RUN python3 -m ensurepip
 RUN pip3 install --no-cache --upgrade pip setuptools
 
 # run script de vsensor
+RUN python3 /data/sensors.py
+RUN ls -lah /data

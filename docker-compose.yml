@@ -3,23 +3,31 @@ version: '3.1'
 services:
 
   sensors:
-    hostname: ia_sensors
-    build: ./a/Dockerfile.dataset 
+    hostname: iasensors
+    container_name: iasensors
+    build:
+      context: .
+      dockerfile: Dockerfile.sensors 
 
   insert:
-    hostname: ia_insert
-    build: ./b/Dockerfile.insert
+    hostname: iainsert
+    container_name: iainsert
+    build: 
+      context: .
+      dockerfile: Dockerfile.insert
 
-  mongo:
-    hostname: ia_mongo
-    image: mongo
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+  # mongo:
+  #   hostname: iamongo
+  #   container_name: iamongo
+  #   image: mongo
+  #   restart: always
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: root
+  #     MONGO_INITDB_ROOT_PASSWORD: example
 
   mosquitto:
-    hostname: ia_mosquitto
+    hostname: iamosquitto
+    container_name: iamosquitto
     image: eclipse-mosquitto
     ports:
       - 10083:1883
@@ -29,3 +37,12 @@ services:
     #   - /Main/docker_data/mosquitto/data/:/mosquitto/data
     #   - /Main/docker_data/mosquitto/config/:/mosquitto/config
     #   - /Main/docker_data/mosquitto/log/:/mosquitto/log
+
+  grafana:
+    container_name: iagrafana
+    hostname: iagrafana
+    image: grafana/grafana-oss:main
+    ports:
+      - 10003:3000
+    # volumes:
+    #   - /Main/docker_data/grafana/data/:/var/lib/grafana
