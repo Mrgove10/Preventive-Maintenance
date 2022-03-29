@@ -65,7 +65,7 @@ def split_file():
 
 @cli.command()
 def file_to_mqtt():
-    path = Path("debug/data")
+    path = Path("/data")
     regex = re.compile(r"[\d+].csv")
 
     for file in path.iterdir():
