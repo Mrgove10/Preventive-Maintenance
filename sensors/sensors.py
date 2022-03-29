@@ -65,12 +65,12 @@ def split_file():
 
 @cli.command()
 def file_to_mqtt():
-    path = Path("/data")
+    path = Path("debug/data")
     regex = re.compile(r"[\d+].csv")
 
     for file in path.iterdir():
         if file.is_file() and regex.match(file.name):
-            with open(file) as f:
+            with open(file, mode="r", encoding="utf-8-sig") as f:
                 reader = csv.DictReader(f, delimiter=",")
                 for row in reader:
                     publish(topic=f"sensor/{file.stem}", payload=json.dumps(row))
