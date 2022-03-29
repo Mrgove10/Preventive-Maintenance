@@ -1,0 +1,14 @@
+FROM alpine
+COPY insert/ /insert/
+RUN ls /insert
+
+# Install node
+RUN apk add nodejs npm
+RUN node --version
+RUN npm --version
+
+# run node script
+WORKDIR "/insert"
+RUN pwd
+RUN npm i 
+RUN node index.js

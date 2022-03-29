@@ -1,0 +1,31 @@
+version: '3.1'
+
+services:
+
+  sensors:
+    hostname: ia_sensors
+    build: ./a/Dockerfile.dataset 
+
+  insert:
+    hostname: ia_insert
+    build: ./b/Dockerfile.insert
+
+  mongo:
+    hostname: ia_mongo
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  mosquitto:
+    hostname: ia_mosquitto
+    image: eclipse-mosquitto
+    ports:
+      - 10083:1883
+      - 10883:8883
+    restart: unless-stopped
+    # volumes:
+    #   - /Main/docker_data/mosquitto/data/:/mosquitto/data
+    #   - /Main/docker_data/mosquitto/config/:/mosquitto/config
+    #   - /Main/docker_data/mosquitto/log/:/mosquitto/log
