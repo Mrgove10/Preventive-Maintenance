@@ -16,7 +16,7 @@ def etablish_mqtt_connexion():
     client = MQTTLib.Client()
     client.on_connect = on_connect
     client.connect("iamosquitto", 10083, 60)
-
+    print("connection initiated")
     return client
 
 def publish(*, topic: str, payload: str):
@@ -61,11 +61,12 @@ def file_to_mqtt():
     path = Path("/data")
 
     for file in path.iterdir():
-        if file.name != "dataset_MP.csv":
-            content = file.read_text()
-            print(f"sensor/{file.stem}")
-            publish(topic=f"sensor/{file.stem}", payload=json.dumps(content.split("\n").pop(0)))
-            time.sleep(60)
+        if file.is_file():
+            if file.name != "dataset_MP.csv" and file.name != "requirements.txt" and file.name != "sensors.py":
+                content = file.read_text()
+                print(f"sensor/{file.stem}")
+                publish(topic=f"sensor/{file.stem}", payload=json.dumps(content.split("\n").pop(0)))
+                time.sleep(2.5)
 
 if __name__ == "__main__":
     cli()

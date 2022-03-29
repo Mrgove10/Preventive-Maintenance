@@ -6,7 +6,8 @@ const { InfluxDB, Point } = require("@influxdata/influxdb-client");
 client.on('connect', function () {
   client.subscribe('sensor/#', function (err) {
     if (!err) {
-      client.publish('presence', 'Hello mqtt')
+      // client.publish('presence', 'Hello mqtt')
+      console.log("Connection initiated")
     }
   })
 })
@@ -14,12 +15,8 @@ client.on('connect', function () {
 client.on('message', function (topic, message) {
   // message is Buffer
   console.log(message.toString())
-  client.end()
+  // client.end()
 })
-setInterval(() => {
-  console.log("COUCOU")
-}, 2500);
-
 
 setTimeout(() => {
   // const url = "https://us-west-2-1.aws.cloud2.influxdata.com";
