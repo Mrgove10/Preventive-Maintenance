@@ -14,25 +14,26 @@ client.on('connect', function () {
 
 client.on('message', function (topic, message) {
   // message is Buffer
+  console.log(topic.charAt(topic.length - 1))
   console.log(message.toString())
-  // client.end()
-  const url = "http://iainflux:8086";
-  const token = "my-super-secret-auth-token";
-  const org = "my-org";
-  const bucket = "my-bucket";
+  message = message.toJSON()
 
-  const influxclient = new InfluxDB({ url: url, token: token });
-  const writeApi = influxclient.getWriteApi(org, bucket);
-  const point = new Point("weatherstation")
+  const writeApi = new InfluxDB({ url: "http://iainflux:8086/", token: "my-super-secret-auth-token" }).getWriteApi("my-org", "my-bucket", 's')
+  const point = new Point("temperature")
     .tag("sensor", 1)
-    .floatField("temperature", 23.4)
+    .floatField("temp_process", message['Process temperature [K]'])
+    .floatField("temp_air", message['Air temperature [K]'])
+    .intField("udi",message["UDI"])
+    .stringField("product_id", message['Product ID'])
+    .floatField("speed_rot", message['Rotational speed [rpm]'])
     .timestamp(new Date());
 
   writeApi.writePoint(point);
 
   writeApi
     .close()
-    .then(() => {
+    .then((f) => {
+      console.log(f)
       console.log("FINISHED");
     })
     .catch((e) => {
