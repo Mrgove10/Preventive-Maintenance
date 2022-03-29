@@ -27,10 +27,11 @@ services:
     container_name: iainflux
     image: influxdb:2.1-alpine
     ports:
-      - '10086:8086'
+      - '8086:8086'
+      - '8088:8088'
     volumes:
-      - $PWD/docker/influx/data:/var/lib/influxdb2
-      - $PWD/docker/influx/config:/etc/influxdb2
+      - ./docker/influx/data:/var/lib/influxdb2
+      - ./docker/influx/config:/etc/influxdb2
     environment:
       - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_USERNAME=my-user
@@ -38,7 +39,8 @@ services:
       - DOCKER_INFLUXDB_INIT_ORG=my-org
       - DOCKER_INFLUXDB_INIT_BUCKET=my-bucket
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token
-
+      - DOCKER_INFLUXDB_HTTP_AUTH_ENABLED=true
+    
   mosquitto:
     hostname: iamosquitto
     container_name: iamosquitto
@@ -47,9 +49,9 @@ services:
       - 10083:10083
     restart: unless-stopped
     volumes:
-      - $PWD/docker/mosquitto/data/:/mosquitto/data
-      - $PWD/docker/mosquitto/config/:/mosquitto/config
-      - $PWD/docker/mosquitto/log/:/mosquitto/log
+      - ./docker/mosquitto/data/:/mosquitto/data
+      - ./docker/mosquitto/config/:/mosquitto/config
+      - ./docker/mosquitto/log/:/mosquitto/log
 
   grafana:
     container_name: iagrafana
@@ -58,6 +60,6 @@ services:
     ports:
       - 10003:3000
     volumes:
-      - $PWD/docker/grafana/data/:/var/lib/grafana  
+      - ./docker/grafana/data/:/var/lib/grafana  
     depends_on:
       - "influxdb"

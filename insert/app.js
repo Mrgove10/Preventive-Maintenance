@@ -16,12 +16,8 @@ client.on('message', function (topic, message) {
   // message is Buffer
   console.log(message.toString())
   // client.end()
-})
-
-setTimeout(() => {
-  // const url = "https://us-west-2-1.aws.cloud2.influxdata.com";
-  const url = "http://iainflux:10086";
-  const token = "my-token";
+  const url = "http://iainflux:8086";
+  const token = "my-super-secret-auth-token";
   const org = "my-org";
   const bucket = "my-bucket";
 
@@ -43,4 +39,4 @@ setTimeout(() => {
       console.error(e);
       console.log("Finished ERROR");
     });
-}, 30000);
+})
