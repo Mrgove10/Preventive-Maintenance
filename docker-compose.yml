@@ -8,6 +8,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.sensors 
+    depends_on:
+      - "insert"
 
   insert:
     hostname: iainsert
@@ -15,15 +17,23 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile.insert
+    depends_on:
+      - "influxdb"
 
-  # mongo:
-  #   hostname: iamongo
-  #   container_name: iamongo
-  #   image: mongo
-  #   restart: always
-  #   environment:
-  #     MONGO_INITDB_ROOT_USERNAME: root
-  #     MONGO_INITDB_ROOT_PASSWORD: example
+  influxdb:
+    hostname: iainflux
+    container_name: iainflux
+    image: influxdb:latest
+    ports:
+      - '10086:8086'
+    # volumes:
+    #   - influxdb-storage:/var/lib/influxdb
+    environment:
+      DOCKER_INFLUXDB_INIT_USERNAME: "admin"
+      DOCKER_INFLUXDB_INIT_PASSWORD: "admin" 
+      DOCKER_INFLUXDB_INIT_ORG: "my-org" 
+      DOCKER_INFLUXDB_INIT_BUCKET: "my-bucket"
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: "zizi"
 
   mosquitto:
     hostname: iamosquitto

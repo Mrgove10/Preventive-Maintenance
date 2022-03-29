@@ -1,4 +1,31 @@
 import csv
+import json
+from pathlib import Path
+
+import paho.mqtt.client as MQTTLib
+from typer import Typer
+
+cli = Typer()
+
+
+def on_connect(client, userdata, flags, rc):
+    print(userdata)
+    print(flags)
+    print("Connection returned result: " + MQTTLib.connack_string(rc))
+
+
+def etablish_mqtt_connexion():
+    client = MQTTLib.Client()
+    client.on_connect = on_connect
+    client.connect("iamosquitto", 10083, 60)
+
+    yield client
+
+
+def publish(*, topic: str, payload: str):
+
+    with etablish_mqtt_connexion() as client:
+        client.publish(topic, payloads)
 
 
 def create_csv_file(header: str, d: list, index: int):
@@ -9,18 +36,20 @@ def create_csv_file(header: str, d: list, index: int):
     for row in d:
         data.append(",".join(row))
 
-    with open(f"/data/{index}.csv", "w") as f:
+    with open(f"debug/data/{index}.csv", "w") as f:
         f.writelines(",".join(header))
         f.write("\n")
         f.writelines("\n".join(data))
 
-def main():
+
+@cli.command()
+def split_file():
     # NOTE: to change
     chunk_size = 1000
     line_numbers = 0
     header = []
 
-    with open("/data/dataset_MP.csv") as f:
+    with open("debug/data/dataset_MP.csv") as f:
 
         list_data = list(csv.reader(f, delimiter=","))
         line_numbers = len(list_data)
@@ -33,5 +62,15 @@ def main():
             index += 1
 
 
+@cli.command()
+def file_to_mqtt():
+    path = Path("debug/data")
+
+    for file in path.iterdir():
+        if file.name != "dataset_MP.csv":
+            content = file.read_text()
+            publish(topic=f"sensor/{file.stem}", payload=json.dumps(content.split("\n").pop(0)))
+
+
 if __name__ == "__main__":
-    main()
+    cli()

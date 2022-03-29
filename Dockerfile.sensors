@@ -2,14 +2,21 @@ FROM alpine
 RUN echo 'hello'
 RUN mkdir /data
 COPY dataset/dataset_MP.csv /data/
-COPY sensors/sensors.py /data/
+COPY sensors/ /data/
 
 # Install python/pip
 ENV PYTHONUNBUFFERED=1
 RUN apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python
 RUN python3 -m ensurepip
-RUN pip3 install --no-cache --upgrade pip setuptools
+RUN python3 --version
+
+# CD
+WORKDIR "/data"
+RUN ls -lah 
+
+# reqs
+RUN pip3 install -r requirements.txt
 
 # run script de vsensor
-RUN python3 /data/sensors.py
-RUN ls -lah /data
+RUN python3 -m sensors split-file
+CMD python3 -m sensors file-to-mqtt
