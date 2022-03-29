@@ -10,6 +10,7 @@ services:
       dockerfile: Dockerfile.sensors 
     depends_on:
       - "insert"
+      - "mosquitto"
 
   insert:
     hostname: iainsert
@@ -19,34 +20,35 @@ services:
       dockerfile: Dockerfile.insert
     depends_on:
       - "influxdb"
+      - "mosquitto"
 
   influxdb:
     hostname: iainflux
     container_name: iainflux
-    image: influxdb:latest
+    image: influxdb:2.1-alpine
     ports:
       - '10086:8086'
-    # volumes:
-    #   - influxdb-storage:/var/lib/influxdb
+    volumes:
+      - $PWD/docker/influx/data:/var/lib/influxdb2
+      - $PWD/docker/influx/config:/etc/influxdb2
     environment:
-      DOCKER_INFLUXDB_INIT_USERNAME: "admin"
-      DOCKER_INFLUXDB_INIT_PASSWORD: "admin" 
-      DOCKER_INFLUXDB_INIT_ORG: "my-org" 
-      DOCKER_INFLUXDB_INIT_BUCKET: "my-bucket"
-      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: "zizi"
+      - DOCKER_INFLUXDB_INIT_USERNAME=my-user
+      - DOCKER_INFLUXDB_INIT_PASSWORD=my-password
+      - DOCKER_INFLUXDB_INIT_ORG=my-org
+      - DOCKER_INFLUXDB_INIT_BUCKET=my-bucket
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token
 
   mosquitto:
     hostname: iamosquitto
     container_name: iamosquitto
     image: eclipse-mosquitto
     ports:
-      - 10083:1883
-      - 10883:8883
+      - 10083:10083
     restart: unless-stopped
-    # volumes:
-    #   - /Main/docker_data/mosquitto/data/:/mosquitto/data
-    #   - /Main/docker_data/mosquitto/config/:/mosquitto/config
-    #   - /Main/docker_data/mosquitto/log/:/mosquitto/log
+    volumes:
+      - $PWD/docker/mosquitto/data/:/mosquitto/data
+      - $PWD/docker/mosquitto/config/:/mosquitto/config
+      - $PWD/docker/mosquitto/log/:/mosquitto/log
 
   grafana:
     container_name: iagrafana
@@ -54,5 +56,7 @@ services:
     image: grafana/grafana-oss:main
     ports:
       - 10003:3000
-    # volumes:
-    #   - /Main/docker_data/grafana/data/:/var/lib/grafana
+    volumes:
+      - $PWD/docker/grafana/data/:/var/lib/grafana  
+    depends_on:
+      - "influxdb"
