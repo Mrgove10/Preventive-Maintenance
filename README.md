@@ -1,4 +1,4 @@
-# Predictorve maintenance
+# Predictive Maintenance
 
 ## running
 
