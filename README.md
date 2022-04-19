@@ -15,7 +15,7 @@
 
 ![archi diagram](docs/iot_stack.png)
 
-`
+```
 create table sensor_data(
     udi serial PRIMARY KEY,
     product_id VARCHAR(500) UNIQUE NOT NULL,
@@ -32,4 +32,4 @@ create table sensor_data(
     OSF bigint,
     RNF bigint
 )
-`
+```
