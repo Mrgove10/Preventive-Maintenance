@@ -1,43 +1,51 @@
 const mqtt = require('mqtt')
 const client = mqtt.connect('mqtt://iamosquitto:10083')
-const { InfluxDB, Point } = require("@influxdata/influxdb-client");
+const { Pool } = require('pg');
+require('dotenv').config()
+
+
+const PSQLPool = new Pool({
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_DATABASE,
+    password: process.env.DB_PASSWORD,
+    port: 5432,
+})
+
+let is_database_connected = false;
 
 
 client.on('connect', function () {
-  client.subscribe('sensor/#', function (err) {
-    if (!err) {
-      // client.publish('presence', 'Hello mqtt')
-      console.log("Connection initiated")
-    }
-  })
+    client.subscribe('sensor/#', function (err) {
+        if (!err) {
+            // client.publish('presence', 'Hello mqtt')
+            console.log("Connection initiated")
+        }
+    })
 })
 
 client.on('message', function (topic, message) {
-  // message is Buffer
-  console.log(topic.charAt(topic.length - 1))
-  console.log(message.toString())
-  message = message.toJSON()
-
-  const writeApi = new InfluxDB({ url: "http://iainflux:8086/", token: "my-super-secret-auth-token" }).getWriteApi("my-org", "my-bucket", 's')
-  const point = new Point("temperature")
-    .tag("sensor", 1)
-    .floatField("temp_process", message['Process temperature [K]'])
-    .floatField("temp_air", message['Air temperature [K]'])
-    .intField("udi",message["UDI"])
-    .stringField("product_id", message['Product ID'])
-    .floatField("speed_rot", message['Rotational speed [rpm]'])
-    .timestamp(new Date());
-
-  writeApi.writePoint(point);
-
-  writeApi
-    .close()
-    .then((f) => {
-      console.log(f)
-      console.log("FINISHED");
-    })
-    .catch((e) => {
-      console.error(e);
-      console.log("Finished ERROR");
-    });
+    persistData(JSON.parse(message))
 })
+
+async function persistData({ _, product_id, type, air_temperature_k, process_temperature_k, rotational_speed_rpm, torque_nm, tool_wear_min, machine_failure, TWF, HDF, PWF, OSF, RNF }) {
+
+    await PSQLPool.query(`
+        INSERT INTO sensor_data (
+            product_id,
+            type,
+            air_temperature_k,
+            process_temperature_k,
+            rotational_speed_rpm,
+            torque_nm,
+            tool_wear_min,
+            machine_failure,
+            TWF,
+            HDF,
+            PWF,
+            OSF,
+            RNF
+        ) VALUES('${product_id}','${type}',${air_temperature_k},${process_temperature_k},${rotational_speed_rpm},${torque_nm},${tool_wear_min},${machine_failure},${TWF},${HDF},${PWF},${OSF}, ${RNF});
+    `);
+
+}

@@ -1,7 +1,6 @@
 import csv
 import json
 import re
-import time
 from pathlib import Path
 
 import paho.mqtt.client as MQTTLib
@@ -11,8 +10,6 @@ cli = Typer()
 
 
 def on_connect(client, userdata, flags, rc):
-    print(userdata)
-    print(flags)
     print("Connection returned result: " + MQTTLib.connack_string(rc))
 
 
@@ -74,7 +71,6 @@ def file_to_mqtt():
                 reader = csv.DictReader(f, delimiter=",")
                 for row in reader:
                     publish(topic=f"sensor/{file.stem}", payload=json.dumps(row))
-                    time.sleep(2.5)
 
 
 if __name__ == "__main__":

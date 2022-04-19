@@ -12,12 +12,12 @@ RUN python3 --version
 
 # CD
 WORKDIR "/data"
-RUN ls -lah 
+RUN ls -lah
 
 # reqs
 RUN pip3 install -r requirements.txt
 
 # run script de vsensor
 RUN python3 -m sensors split-file
-RUN ls -lah 
+RUN ls -lah
 CMD python3 -m sensors file-to-mqtt

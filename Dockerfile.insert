@@ -12,6 +12,6 @@ RUN npm install pm2 -g
 # run node script
 WORKDIR "/insert"
 RUN pwd
-RUN npm i 
+RUN npm i
 RUN ls -lah
 CMD ["pm2-runtime", "app.js"]
