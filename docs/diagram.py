@@ -7,8 +7,9 @@ from diagrams.programming.language import Python, Javascript
 from diagrams.onprem.compute import Server
 from diagrams.onprem.monitoring import Grafana
 from diagrams.aws.iot import IotMqtt
+from diagrams.custom import Custom
 
-with Diagram("IOT Stack", show=False): 
+with Diagram("IOT Stack", show=False, direction="LR"): 
     with Cluster("Sensors"):
         sensors = [
             Python("Sensor 1"),
@@ -16,4 +17,10 @@ with Diagram("IOT Stack", show=False):
             Python("Sensor 3"),
             Python("Sensor ...")
         ]
-    sensors >> IotMqtt("mosquitto") >> Javascript("Insert script") >> Postgresql("Database") << Grafana("Visialisaton")
+    
+    with Cluster("Online"):
+        bdd = Postgresql("Database")
+
+    Custom("", "./dataiku.jpg") >> bdd
+    
+    sensors >> IotMqtt("mosquitto") >> Javascript("Insert script") >> bdd << Grafana("Visialisaton")
