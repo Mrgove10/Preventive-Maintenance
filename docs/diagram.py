@@ -18,9 +18,9 @@ with Diagram("IOT Stack", show=False, direction="LR"):
             Python("Sensor ...")
         ]
     
-    with Cluster("Online"):
+    with Cluster("Online Hosted"):
         bdd = Postgresql("Database")
 
-    Custom("", "./dataiku.jpg") >> bdd
+    bdd << Custom("", "./dataiku.jpg")
     
     sensors >> IotMqtt("mosquitto") >> Javascript("Insert script") >> bdd << Grafana("Visialisaton")
