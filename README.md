@@ -11,8 +11,9 @@
 |mqtt|10083|||
 |grafana|10003|admin|admin|
 
+## diagram
 
-
+![archi diagram](docs/iot_stack.png)
 
 create table sensor_data(
     udi serial PRIMARY KEY,
