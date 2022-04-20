@@ -1,5 +1,4 @@
 FROM alpine
-RUN echo 'hello'
 RUN mkdir /data
 COPY dataset/dataset_MP.csv /data/
 COPY sensors/ /data/
