@@ -21,7 +21,7 @@ with Diagram("IOT Stack", show=False, direction="TB"):
     with Cluster("Online Hosted"):
         bdd = Postgresql("Database")
 
-    mqttbroker = Custom("", "")
+    mqttbroker = Custom("", "mosquitto.png")
     dataiku = Custom("", "./dataiku.jpg")
     bdd << dataiku
     
@@ -30,7 +30,7 @@ with Diagram("IOT Stack", show=False, direction="TB"):
     with Cluster("Model Update"):
         model = Python("Model")
         predict = Python("prediction")
-        dataiku >> model >> predict >> mqttbroker
+        dataiku >> model >> predict << mqttbroker
 
 
     with Cluster("Real Time rediction"):
