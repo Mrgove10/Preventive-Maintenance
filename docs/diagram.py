@@ -9,7 +9,7 @@ from diagrams.onprem.monitoring import Grafana
 from diagrams.aws.iot import IotMqtt
 from diagrams.custom import Custom
 
-with Diagram("IOT Stack", show=False, direction="LR"): 
+with Diagram("IOT Stack", show=False, direction="TB"): 
     with Cluster("Sensors"):
         sensors = [
             Python("Sensor 1"),
@@ -21,6 +21,17 @@ with Diagram("IOT Stack", show=False, direction="LR"):
     with Cluster("Online Hosted"):
         bdd = Postgresql("Database")
 
-    bdd << Custom("", "./dataiku.jpg")
+    mqttbroker = IotMqtt("mosquitto")
+    dataiku = Custom("", "./dataiku.jpg")
+    bdd << dataiku
     
-    sensors >> IotMqtt("mosquitto") >> Javascript("Insert script") >> bdd << Grafana("Visialisaton")
+    sensors >> mqttbroker >> Javascript("Insert script") >> bdd << Grafana("Visialisaton")
+    
+    with Cluster("Model Update"):
+        model = Python("Model")
+        predict = Python("prediction")
+        dataiku >> model >> predict >> mqttbroker
+
+
+    with Cluster("Real Time rediction"):
+        predict >> model
