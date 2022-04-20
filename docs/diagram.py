@@ -25,7 +25,7 @@ with Diagram("IOT Stack", show=False, direction="TB"):
     dataiku = Custom("", "./dataiku.jpg")
     bdd << dataiku
     
-    sensors >> mqttbroker >> Javascript("Insert script") >> bdd << Grafana("Visialisaton")
+    sensors >> mqttbroker >> Javascript("Insert script") >> bdd << Grafana("Visualisation")
     
     with Cluster("Model Update"):
         model = Python("Model")
