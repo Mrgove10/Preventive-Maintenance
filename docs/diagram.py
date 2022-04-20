@@ -21,7 +21,7 @@ with Diagram("IOT Stack", show=False, direction="TB"):
     with Cluster("Online Hosted"):
         bdd = Postgresql("Database")
 
-    mqttbroker = IotMqtt("mosquitto")
+    mqttbroker = Custom("", "")
     dataiku = Custom("", "./dataiku.jpg")
     bdd << dataiku
     
