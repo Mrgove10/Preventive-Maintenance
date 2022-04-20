@@ -1,0 +1,19 @@
+FROM alpine
+COPY model/ /model/
+
+# Install python
+RUN apk add python3.9
+RUN python --version
+RUN pip --version
+
+WORKDIR "/model"
+
+# launch Venv
+RUN source .venv/bin/activate
+
+#install pip
+RUN pip install
+
+# run script
+RUN pwd
+RUN ls -lah
