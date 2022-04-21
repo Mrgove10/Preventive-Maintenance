@@ -31,5 +31,5 @@ create table sensor_data(
     PWF bigint,
     OSF bigint,
     RNF bigint
-)
+);
 ```

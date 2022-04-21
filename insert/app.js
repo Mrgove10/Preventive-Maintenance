@@ -18,7 +18,6 @@ let is_database_connected = false;
 client.on('connect', function () {
     client.subscribe('sensor/#', function (err) {
         if (!err) {
-            // client.publish('presence', 'Hello mqtt')
             console.log("Connection initiated")
         }
     })

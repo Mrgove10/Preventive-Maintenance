@@ -2,7 +2,7 @@ import csv
 import json
 import re
 from pathlib import Path
-
+import requests
 import paho.mqtt.client as MQTTLib
 from typer import Typer
 
@@ -56,7 +56,7 @@ def split_file():
 
         index = 0
         for i in range(0, line_numbers, chunk_size):
-            create_csv_file(header, list_data[i : i + chunk_size], index)
+            create_csv_file(header, list_data[i: i + chunk_size], index)
             index += 1
 
 
@@ -64,13 +64,18 @@ def split_file():
 def file_to_mqtt():
     path = Path("/data")
     regex = re.compile(r"[\d+].csv")
-
     for file in path.iterdir():
         if file.is_file() and regex.match(file.name):
             with open(file, mode="r", encoding="utf-8-sig") as f:
                 reader = csv.DictReader(f, delimiter=",")
                 for row in reader:
-                    publish(topic=f"sensor/{file.stem}", payload=json.dumps(row))
+                    publish(topic=f"sensor/{file.stem}",
+                            payload=json.dumps(row))
+                    # Also push to predict service
+                    del row["udi"]
+                    del row["product_id"]
+                    req = requests.post(
+                        "http://127.0.0.1:5000", json={"data": json.dumps(list(row.values()))})
 
 
 if __name__ == "__main__":
